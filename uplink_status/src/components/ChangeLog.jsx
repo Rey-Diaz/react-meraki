@@ -52,6 +52,10 @@ function ChangeLog() {
         accessor: 'networkId',
       },
       {
+        Header: 'Network Name',
+        accessor: 'networkName',
+      },
+      {
         Header: 'Serial',
         accessor: 'serial',
       },
@@ -67,6 +71,7 @@ function ChangeLog() {
         Header: 'New Status',
         accessor: 'newStatus',
       },
+      // Add more columns as needed
     ],
     []
   );

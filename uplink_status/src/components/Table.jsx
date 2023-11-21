@@ -23,6 +23,10 @@ const Table = ({ data }) => {
         accessor: 'networkId',
       },
       {
+        Header: 'Network Name',
+        accessor: 'networkName',
+      },
+      {
         Header: 'Serial',
         accessor: 'serial',
       },
@@ -49,6 +53,7 @@ const Table = ({ data }) => {
           return <div>{uplinks}</div>;
         },
       },
+      // Add more columns as needed
     ],
     []
   );

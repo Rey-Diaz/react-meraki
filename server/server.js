@@ -15,25 +15,7 @@ app.use(cors({
   methods: 'GET', // Add other HTTP methods if needed
 }));
 
-// Define a route that proxies requests to the Meraki API
-app.get('/meraki-data', async (req, res) => {
-  try {
-    const response = await axios.get(
-      `https://api.meraki.com/api/v1/organizations/${process.env.ORG_ID}/uplinks/statuses`,
-      {
-        headers: {
-          'X-Cisco-Meraki-API-Key': process.env.MERAKI_API_KEY,
-        },
-      }
-    );
-    res.json(response.data);
-  } catch (error) {
-    console.error('Error fetching Meraki data:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Function to make the API call
+// Function to make the API call for uplink statuses
 async function fetchMerakiData() {
   try {
     const response = await axios.get(
@@ -51,14 +33,39 @@ async function fetchMerakiData() {
   }
 }
 
+// Function to fetch network names
+async function fetchNetworkNames() {
+  try {
+    const networksResponse = await axios.get(
+      `https://api.meraki.com/api/v1/organizations/${process.env.ORG_ID}/networks`,
+      {
+        headers: {
+          'X-Cisco-Meraki-API-Key': process.env.MERAKI_API_KEY,
+        },
+      }
+    );
+    return networksResponse.data;
+  } catch (error) {
+    console.error('Error fetching network names:', error);
+    return null;
+  }
+}
+
 let apiCallCounter = 0;
 let lastApiCallTime = null;
 
 // Set up the interval to call the API every 2 minutes (120000 milliseconds)
 setInterval(async () => {
-  const data = await fetchMerakiData();
-  if (data) {
-    compareUplinkData(data);
+  const uplinkData = await fetchMerakiData();
+  const networkNames = await fetchNetworkNames();
+
+  if (uplinkData && networkNames) {
+    const mergedData = uplinkData.map(device => {
+      const network = networkNames.find(net => net.id === device.networkId);
+      return { ...device, networkName: network ? network.name : 'Unknown' };
+    });
+
+    compareUplinkData(mergedData);
     apiCallCounter++;
     lastApiCallTime = new Date(); // Record the timestamp
   }
@@ -84,6 +91,7 @@ function compareUplinkData(currentData) {
           // Log the change
           changeLog.push({
             networkId: device.networkId,
+            networkName: device.networkName, // Include network name in the log
             serial: device.serial,
             interface: uplink.interface,
             oldStatus: lastUplink.status,
