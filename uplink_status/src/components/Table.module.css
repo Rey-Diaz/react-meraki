@@ -1,0 +1,34 @@
+/* Table.module.css */
+
+/* Use Cisco Meraki styled colors */
+.tableCard {
+    border: 1px solid #ccc; /* Cisco Meraki styled border color */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    margin: 16px;
+    background-color: #fff;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th,
+  .table td {
+    border: 1px solid #ccc; /* Cisco Meraki styled border color */
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .table th {
+    background-color: #f2f2f2; /* Cisco Meraki styled background color for headers */
+  }
+  
+  /* Customize text color, you can choose a suitable color for text */
+  .table th,
+  .table td {
+    color: #333; /* Cisco Meraki styled text color */
+  }
+  

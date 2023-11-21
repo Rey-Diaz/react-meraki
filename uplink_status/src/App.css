@@ -1,0 +1,51 @@
+/* app.module.css */
+
+/* Reset some default margin and padding */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Apply a background color to the entire app */
+.App {
+  background-color: #f2f2f2; /* Cisco Meraki styled background color */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+}
+
+/* Apply styling to the Navbar component */
+.navbar {
+  position: fixed; /* Make the header fixed */
+  top: 0; /* Position it at the top of the viewport */
+  width: 100%; /* Full width */
+  background-color: #007dba; /* Cisco Meraki styled navbar background color */
+  color: #fff; /* Navbar text color */
+  padding: 16px;
+  z-index: 1; /* Ensure the header is on top of other content */
+}
+
+/* Center the Navbar content horizontally */
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Style the links in the Navbar */
+.navbar a {
+  color: #fff; /* Link text color */
+  text-decoration: none;
+  margin: 0 16px; /* Add some spacing between links */
+  font-weight: bold;
+}
+
+/* Add hover effect for links in the Navbar */
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+/* Apply styles to the main content area */
+.content {
+  flex-grow: 1; /* Expand to fill available vertical space */
+  padding: 80px 20px 20px; /* Add padding for the fixed header */
+}

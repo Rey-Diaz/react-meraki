@@ -1,0 +1,49 @@
+.container {
+    padding: 20px;
+    max-width: 1200px; /* Adjust as needed */
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.header {
+    text-align: center;
+    color: #005073; /* Example color */
+    margin-bottom: 20px;
+}
+
+.summarySection {
+    width: 100%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pageTitle {
+    font-size: 1.5em;
+    color: #007c92;
+}
+
+.summaryDetails {
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.condensedViewSection, .changeLogSection {
+    flex: 1 1 48%; /* Each section takes up roughly half the width */
+    background-color: #fff;
+    padding: 20px;
+    margin: 1%; /* Adds a little space between the sections */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Add responsive behavior */
+@media (max-width: 768px) {
+    .condensedViewSection, .changeLogSection {
+      flex-basis: 100%; /* Each section takes full width on smaller screens */
+    }
+}

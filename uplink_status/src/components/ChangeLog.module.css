@@ -1,0 +1,59 @@
+/* ChangeLog.module.css */
+
+/* Use Cisco Meraki styled colors */
+.changeLog {
+    border: 1px solid #ccc; /* Cisco Meraki styled border color */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    margin: 16px;
+    background-color: #fff;
+    display: flex; /* Use flex layout */
+    flex-direction: column; /* Stack children vertically */
+    position: relative; /* Enable absolute positioning for the button */
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th,
+  .table td {
+    border: 1px solid #ccc; /* Cisco Meraki styled border color */
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .table th {
+    background-color: #f2f2f2; /* Cisco Meraki styled background color for headers */
+  }
+  
+  /* Customize text color, you can choose a suitable color for text */
+  .table th,
+  .table td {
+    color: #333; /* Cisco Meraki styled text color */
+  }
+  
+  /* Button styles for Reset Change Log */
+  .resetButton {
+    background-color: #0079c2; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none; /* Remove button border */
+    border-radius: 4px; /* Button border radius */
+    padding: 8px 16px; /* Button padding */
+    margin-top: auto; /* Push the button to the bottom of the container */
+    align-self: flex-end; /* Align the button to the flex-end (right) */
+    cursor: pointer; /* Show pointer cursor on hover */
+    position: absolute; /* Enable absolute positioning */
+    top: 16px; /* Distance from the top */
+    right: 16px; /* Distance from the right */
+  }
+  
+  /* Style the icon within the button */
+  .icon {
+    margin-right: 8px; /* Add space between icon and text */
+  }
+  
+  /* Additional styles can be added here as needed */
+  

@@ -1,0 +1,34 @@
+/* TableViewPage.module.css */
+
+/* Page container */
+.pageContainer {
+    padding: 20px;
+    background-color: #f2f2f2; /* Cisco Meraki styled background color */
+  }
+  
+  /* Page title */
+  .pageTitle {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333; /* Cisco Meraki styled text color */
+    margin-bottom: 20px;
+  }
+  
+  /* Error message */
+  .errorMessage {
+    color: #d9534f; /* Cisco Meraki styled error message color */
+    font-weight: bold;
+  }
+  
+  /* Table container */
+  .tableContainer {
+    border: 1px solid #ccc; /* Cisco Meraki styled border color */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    background-color: #fff;
+  }
+  
+  /* Adjust the styling of the Table component */
+  /* You can also create a specific CSS module for the Table component if needed */
+  
