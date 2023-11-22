@@ -44,7 +44,7 @@ async function fetchMerakiData() {
       return { ...uplink, networkName: network ? network.name : 'Unknown' };
     });
 
-    console.log("Enriched Uplink Data:", enrichedUplinkData);
+    // console.log("Enriched Uplink Data:", enrichedUplinkData);
     return { uplinkData: enrichedUplinkData, networkData };
   } catch (error) {
     console.error('Error fetching Meraki data:', error);
@@ -63,19 +63,72 @@ app.get('/meraki-data', async (req, res) => {
   }
 });
 
-// Variables for tracking API calls
-let apiCallCounter = 0;
-let lastApiCallTime = null;
+// Load the DUPLICATE_TIME_WINDOW from the .env file
+const duplicateTimeWindow = parseInt(process.env.DUPLICATE_TIME_WINDOW) || 300000; // Default to 5 minutes if not defined
 
-// Periodic task to fetch Meraki data
-setInterval(async () => {
-  const enrichedData = await fetchMerakiData();
-  if (enrichedData) {
-    compareUplinkData(enrichedData.uplinkData, enrichedData.networkData);
-    apiCallCounter++;
-    lastApiCallTime = new Date();
+// Function to determine if a change should be logged
+function shouldLogChange(deviceSerial, interface) {
+  const currentTime = new Date();
+
+  // Check for duplicates within the time window
+  const recentChanges = changeLog.filter(entry =>
+    entry.serial === deviceSerial &&
+    entry.interface === interface &&
+    currentTime - new Date(entry.timestamp) < duplicateTimeWindow
+  );
+
+  // If duplicates are found, skip logging
+  if (recentChanges.length > 0) {
+    console.log(`Skipping duplicate log for ${deviceSerial} - ${interface}`);
+    return false;
   }
-}, 60000);
+
+  return true;
+}
+
+// Function to format change log entry
+function formatChangeLogEntry(entry) {
+  return `Network ID: ${entry.networkId}\n` +
+         `Network Name: ${entry.networkName}\n` +
+         `Device Serial: ${entry.serial}\n` +
+         `Interface: ${entry.interface}\n` +
+         `Old Status: ${entry.oldStatus}\n` +
+         `New Status: ${entry.newStatus}\n` +
+         `Timestamp: ${entry.timestamp}`;
+}
+
+// Function to compare uplink data
+function compareUplinkData(currentData, networkData) {
+  if (!lastApiResponse) {
+    lastApiResponse = currentData;
+    return;
+  }
+
+  currentData.forEach(device => {
+    const lastDevice = lastApiResponse.find(d => d.serial === device.serial);
+    if (lastDevice) {
+      device.uplinks.forEach(uplink => {
+        const lastUplink = lastDevice.uplinks.find(u => u.interface === uplink.interface);
+        if (lastUplink && lastUplink.status === 'active' && uplink.status !== 'active' && shouldLogChange(device.serial, uplink.interface)) {
+          const changeLogEntry = {
+            networkId: device.networkId,
+            networkName: networkData.find(n => n.id === device.networkId)?.name || 'Unknown',
+            serial: device.serial,
+            interface: uplink.interface,
+            oldStatus: lastUplink.status,
+            newStatus: uplink.status,
+            timestamp: new Date().toISOString()
+          };
+
+          changeLog.push(changeLogEntry);
+          sendEmail("Device Status Change Alert", formatChangeLogEntry(changeLogEntry));
+        }
+      });
+    }
+  });
+
+  lastApiResponse = currentData;
+}
 
 // Variables for storing API response and change log
 let lastApiResponse = null;
@@ -110,60 +163,24 @@ async function sendEmail(subject, body) {
   }
 }
 
-// Function to format change log entry
-function formatChangeLogEntry(entry) {
-  return `Network ID: ${entry.networkId}\n` +
-         `Network Name: ${entry.networkName}\n` +
-         `Device Serial: ${entry.serial}\n` +
-         `Interface: ${entry.interface}\n` +
-         `Old Status: ${entry.oldStatus}\n` +
-         `New Status: ${entry.newStatus}\n` +
-         `Timestamp: ${entry.timestamp}`;
-}
-
-// Function to determine if a change should be logged
-function shouldLogChange(deviceSerial) {
-  const recentChange = changeLog.find(entry => entry.serial === deviceSerial && new Date() - new Date(entry.timestamp) < 300000);
-  return !recentChange;
-}
-
-// Function to compare uplink data
-function compareUplinkData(currentData, networkData) {
-  if (!lastApiResponse) {
-    lastApiResponse = currentData;
-    return;
-  }
-
-  currentData.forEach(device => {
-    const lastDevice = lastApiResponse.find(d => d.serial === device.serial);
-    if (lastDevice) {
-      device.uplinks.forEach(uplink => {
-        const lastUplink = lastDevice.uplinks.find(u => u.interface === uplink.interface);
-        if (lastUplink && lastUplink.status === 'active' && uplink.status !== 'active' && shouldLogChange(device.serial)) {
-          const changeLogEntry = {
-            networkId: device.networkId,
-            networkName: networkData.find(n => n.id === device.networkId)?.name || 'Unknown',
-            serial: device.serial,
-            interface: uplink.interface,
-            oldStatus: lastUplink.status,
-            newStatus: uplink.status,
-            timestamp: new Date().toISOString()
-          };
-
-          changeLog.push(changeLogEntry);
-          sendEmail("Device Status Change Alert", formatChangeLogEntry(changeLogEntry));
-        }
-      });
-    }
-  });
-
-  lastApiResponse = currentData;
-}
-
 // Endpoint to retrieve the change log
 app.get('/change-log', (req, res) => {
   res.json(changeLog);
 });
+
+// Variables for tracking API calls
+let apiCallCounter = 0;
+let lastApiCallTime = null;
+
+// Periodic task to fetch Meraki data
+setInterval(async () => {
+  const enrichedData = await fetchMerakiData();
+  if (enrichedData) {
+    compareUplinkData(enrichedData.uplinkData, enrichedData.networkData);
+    apiCallCounter++;
+    lastApiCallTime = new Date();
+  }
+}, 60000);
 
 // Endpoint to retrieve API call count and last sync time
 app.get('/api-call-count', (req, res) => {
